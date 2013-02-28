@@ -17,24 +17,32 @@ class KeyValue:
 
 class HashTable:
     myList = list([0]*10)
+
     def __init__(self):
-        self.myList = list([0]*10)
+        self.hashTableSize = 10
+        self.myList = list([0]*self.hashTableSize)
+        self.load = 0
 
-    def get(self,key):
-        return self.myList[key]
-        # call self.hash(key) for an index
-        # return that key following collisions
+    def search(self,value):
 
-    def set(self,key,value):
+        key = float(value) % float(self.hashTableSize)  
+        #probe until find blank spot or value. if blank return false
+        
+    def insert(self, value):
+        self.checkLoad()
+
+        key = self.hash(value)
         self.myList[key] = value
+        self.load = self.load + 1
         return self.myList
         
         # call self.hash(key) to get index
         # insert key value pair into table .
 
-    def hash(self,key):
-        hashkey=key #collisions much?
-        return hashkey
+    def hash(self,value):
+
+        key = float(value) % float(self.hashTableSize)  
+        return int(key)
 
         #  def hash(self,key):
         # # loop through the characters of the key
@@ -43,8 +51,37 @@ class HashTable:
         # # return (total modulo sizeOfHashTable)   modulo is '%' in Python.
 
     def printHash(self):
+        print "Printing HashTable:"
+        loadRatio = float(self.load)/float(self.hashTableSize)
+        print "Load Ratio: ", loadRatio, "hashTableSize: ", self.hashTableSize, " Load: ", self.load
+
         for nums in self.myList:
-            print self.myList[nums]
+            print self.myList[int(nums)] #prints in binary "{0:b}".format(
+
+    def checkLoad(self):
+        loadRatio = float(self.load)/float(self.hashTableSize)
+        if (loadRatio > .2):
+            print "ratio >.2 so quading"
+            print "Load Ratio: ", loadRatio, "hashTableSize: ", self.hashTableSize, " Load: ", self.load
+            self.quadHashTable()
+        return loadRatio
+
+        #return self.load
+
+    def quadHashTable(self):
+        oldLength = int(self.hashTableSize)
+        self.load = int(0)
+        self.hashTableSize = (oldLength*4) + 1      #set new hash table size 
+        myOldList = list(self.myList)                     #get old hashtable 
+        self.myList = list([0]*self.hashTableSize)  #create a new blank list of that size
+        self.insert(0) #want to add one zero
+        for values in myOldList:
+            if (values != 0):              #only want to insert values that aren't zero
+                self.insert(values)
+                #print(values)
+        #     #do insert method on each one
+       
+
 
 def moves(pegs):
     moves = list()
@@ -77,25 +114,36 @@ def moves(pegs):
             if (idx - 2 >= 0): ## not out of bounds to the left
                 if (int(pegsList[idx-2]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx-1]) == 1): # jumped over the a double peg to the direct left
-                        print "jumped over double pegs to the right", idx
+                        print "jumped over double pegs to the left", idx
                         del cpPegsList[idx]
                         cpPegsList[idx-2]= int(cpPegsList[idx-2])+1
                         moves.append(cpPegsList)
                         cpPegsList = list(pegsList)
 
+            if (idx + 2 < len(pegsList)): ## not out of bounds to the right
+                if (int(pegsList[idx+2]) == 0):  # needs to land on a single peg
+                    if (int(pegsList[idx+1]) == 1): # jumped over the a double peg to the direct right
+                        print "jumped over double pegs to the right", idx
+                        del cpPegsList[idx]
+                        cpPegsList[idx+2]= int(cpPegsList[idx+2])+1
+                        moves.append(cpPegsList)
+                        cpPegsList = list(pegsList)
+
     
     print "Moves: " + str(moves)
-    return pegsList
+    return moves
 
 
-# def is_solved ( pegs, hashtable T) 
-#    # if (t.search(p)) return false 
-#    for m in moves(p)){ //where moves p is an array that returns all possible moves
-#         if (is_solved(m)) return true;
-#         print (p);//prints in reverse so would use a stack to print in reverse order
-#    }
-#    t.insert(p)
-#    return fasle
+def is_solved ( pegs, table): 
+    if (table.search(pegs)):
+        return False 
+    for m in moves(pegs) :  #where moves p is an array that returns all possible moves
+        print m
+        if (is_solved(''.join(str(elem) for elem in m), table)):
+            return True
+            print m      #//prints in reverse so would use a stack to print in reverse order
+    table.insert(pegs)
+    return False
 
 
 def main():
@@ -120,10 +168,14 @@ def main():
             converted_board = f.read().strip().upper().replace('X', '1').replace('|', '0').replace(" ", "")
 
     print "board =", converted_board
-    # print int(converted_board, 2)
+    print int(converted_board, 2)
     print moves(converted_board)
-    # t = HashTable()
-    # t.set(5,7)
+
+    t = HashTable()
+    is_solved(converted_board, t)
+    
+    t.printHash()
+    # t.insert(5,7)
     # t.printHash()
     # print "t.i:"
     # print t.myList
@@ -131,7 +183,7 @@ def main():
     # print t.set_instance(5,"yo")
     # print t.get_instance_i()
     # print t.myList
-    # t.set(6,"yo")
+    # t.insert(6,"yo")
     # print t.myList
     # print t.get(5)
 
