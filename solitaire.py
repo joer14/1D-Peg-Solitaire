@@ -46,9 +46,51 @@ class HashTable:
         for nums in self.myList:
             print self.myList[nums]
 
-# def is_solved (pegs p, hashtable T) - index of 
-#    if (t.search(p)) return false; 
-#    foreach pegs m in moves(p)){ //where moves p is an array that returns all possible moves
+def moves(pegs):
+    moves = list()
+    pegsList = list(pegs)
+    
+    for idx, peg in enumerate(pegsList):
+        cpPegsList = pegsList
+        currentPeg = int(pegsList[idx])
+        # print idx, peg
+        # nextPeg = int(pegsList[idx+1])
+        # if (idx+2 < len(pegsList)):
+        #     nextnextPeg = int(pegsList[idx+2])
+        # if (idx-2 >= 0):
+        #     previousPreviousPeg = int(pegsList[idx+2])    
+
+        # previousPeg = int(pegsList[idx-1])
+        # previousPreviousPeg = int(pegsList[idx-1])
+
+
+        if (currentPeg == 0): #can't move a double peg
+            if (idx - 3 >= 0): ## not out of bounds to the left
+                if (int(pegsList[idx-3]) == 0):  # needs to land on a single peg
+                    if (int(pegsList[idx-1]) + int(pegsList[idx-2]) == 0): # jumped over 2 single pegs peg to the direct left
+                        print idx, "jumped over two single pegs to the left"
+                        del cpPegsList[idx]
+                        cpPegsList[idx-3]= int(cpPegsList[idx-3])+1
+                        moves.append(cpPegsList)
+                        cpPegsList = pegsList
+
+            if (idx - 2 >= 0): ## not out of bounds to the left
+                if (int(pegsList[idx-2]) == 0):  # needs to land on a single peg
+                    if (int(pegsList[idx-1]) == 1): # jumped over the a double peg to the direct left
+                        print idx, "valid move, record this"
+                        del cpPegsList[idx]
+                        cpPegsList[idx-2]= int(cpPegsList[idx-2])+1
+                        moves.append(cpPegsList)
+                        cpPegsList = pegsList
+
+        print idx, peg
+    print "Moves: " + str(moves)
+    return pegsList
+
+
+# def is_solved ( pegs, hashtable T) 
+#    # if (t.search(p)) return false 
+#    for m in moves(p)){ //where moves p is an array that returns all possible moves
 #         if (is_solved(m)) return true;
 #         print (p);//prints in reverse so would use a stack to print in reverse order
 #    }
@@ -78,20 +120,20 @@ def main():
             converted_board = f.read().strip().upper().replace('X', '1').replace('|', '0').replace(" ", "")
 
     print "board =", converted_board
-    print int(converted_board, 2)
-    
-    t = HashTable()
-    t.set(5,7)
+    # print int(converted_board, 2)
+    print moves(converted_board)
+    # t = HashTable()
+    # t.set(5,7)
     # t.printHash()
     # print "t.i:"
     # print t.myList
     # print "t.set_instance:"
     # print t.set_instance(5,"yo")
     # print t.get_instance_i()
-    print t.myList
-    t.set(6,"yo")
-    print t.myList
-    print t.get(5)
+    # print t.myList
+    # t.set(6,"yo")
+    # print t.myList
+    # print t.get(5)
 
 
 if __name__ == "__main__":
