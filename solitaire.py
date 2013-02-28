@@ -51,7 +51,7 @@ def moves(pegs):
     pegsList = list(pegs)
     
     for idx, peg in enumerate(pegsList):
-        cpPegsList = pegsList
+        cpPegsList = list(pegsList)
         currentPeg = int(pegsList[idx])
         # print idx, peg
         # nextPeg = int(pegsList[idx+1])
@@ -63,27 +63,27 @@ def moves(pegs):
         # previousPeg = int(pegsList[idx-1])
         # previousPreviousPeg = int(pegsList[idx-1])
 
-
+        print idx, peg
         if (currentPeg == 0): #can't move a double peg
             if (idx - 3 >= 0): ## not out of bounds to the left
                 if (int(pegsList[idx-3]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx-1]) + int(pegsList[idx-2]) == 0): # jumped over 2 single pegs peg to the direct left
-                        print idx, "jumped over two single pegs to the left"
+                        print "jumped over two single pegs to the left", idx
                         del cpPegsList[idx]
                         cpPegsList[idx-3]= int(cpPegsList[idx-3])+1
                         moves.append(cpPegsList)
-                        cpPegsList = pegsList
+                        cpPegsList = list(pegsList)
 
             if (idx - 2 >= 0): ## not out of bounds to the left
                 if (int(pegsList[idx-2]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx-1]) == 1): # jumped over the a double peg to the direct left
-                        print idx, "valid move, record this"
+                        print "jumped over double pegs to the right", idx
                         del cpPegsList[idx]
                         cpPegsList[idx-2]= int(cpPegsList[idx-2])+1
                         moves.append(cpPegsList)
-                        cpPegsList = pegsList
+                        cpPegsList = list(pegsList)
 
-        print idx, peg
+    
     print "Moves: " + str(moves)
     return pegsList
 
