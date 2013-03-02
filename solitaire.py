@@ -5,6 +5,7 @@
 # #print "raw_input =", str1
 
 from optparse import OptionParser
+import math
 def getInput():
     input_board = raw_input("Enter board:")
     return input_board.upper().strip().replace('X', '1').replace('|', '0').replace(" ", "")
@@ -23,15 +24,45 @@ class HashTable:
         self.myList = list([0]*self.hashTableSize)
         self.load = 0
 
-    def search(self,value):
+    def search(self,key):
+        #print "doing lookup for: ", key
+        searching = True
+        attempt = 0
+        while (searching):
+            thehash = self.hash(key, attempt)
+            # if (attempt > 0):
+            #     print "hash: ", thehash
+            #     print "attempt: ", attempt
+            #     print "self.myList[attempt] ", self.myList[attempt] 
+            if (self.myList[attempt] == key ):
+                #print "found in table"
+                return True 
+            if (self.myList[attempt] == int("0")):
+                return False
+            attempt = attempt+1
 
-        key = float(value) % float(self.hashTableSize)  
+        # h1 = self.hash1(key)
+        # h2 = self.hash1(key)
+        # m = float(self.hashTableSize) 
+        # searching = True
+        # ivalue = 0
+        # while (searching):
+        #     index = int((h1 + ivalue*h2) % m)
+        #     ivalue = ivalue + 1
+        #     print "self.myList[index]: ", index, self.myList[index]
+        #     if (self.myList[index] == key ):
+        #         print "found in table"
+        #         return True
+        #     else:
+        #         index =int((h1 + ivalue*h2) % m)
+
+        # return False
         #probe until find blank spot or value. if blank return false
         
     def insert(self, value):
         self.checkLoad()
-
-        key = self.hash(value)
+        #print "Inserting"  
+        key = self.hash(value,0)
         self.myList[key] = value
         self.load = self.load + 1
         return self.myList
@@ -39,10 +70,33 @@ class HashTable:
         # call self.hash(key) to get index
         # insert key value pair into table .
 
-    def hash(self,value):
+    def hash(self,key, ivalue):
+        h1 = self.hash1(key)
+        h2 = self.hash1(key)
+        m = float(self.hashTableSize) 
+        
+        return int((h1 + ivalue*h2) % m)
+  
 
-        key = float(value) % float(self.hashTableSize)  
-        return int(key)
+        #  def hash(self,key):
+        # # loop through the characters of the key
+        # #     convert the character to a number  (use ord(c))
+        # #     add this number to running total
+        # # return (total modulo sizeOfHashTable)   modulo is '%' in Python.
+    def hash1(self,value):
+        A = (math.sqrt(5)-1)/2
+        key = float(value)  
+        frac = key*A % 1
+        m = float(self.hashTableSize) 
+
+        return math.floor(m*frac)
+
+    def hash2(self,value):
+        A = (math.sqrt(5)-1)/2
+        key = float(value)  
+        frac = key*A % 1
+        m = float(self.hashTableSize) 
+        return math.floor(m*((m*frac) % 1))
 
         #  def hash(self,key):
         # # loop through the characters of the key
@@ -56,7 +110,8 @@ class HashTable:
         print "Load Ratio: ", loadRatio, "hashTableSize: ", self.hashTableSize, " Load: ", self.load
 
         for nums in self.myList:
-            print nums
+            if (nums != 0):
+                print nums
             #print self.myList[int(nums)] #prints in binary "{0:b}".format(
 
     def checkLoad(self):
@@ -80,8 +135,7 @@ class HashTable:
             if (values != 0):              #only want to insert values that aren't zero
                 self.insert(values)
                 #print(values)
-        #     #do insert method on each one
-       
+        
 
 
 def moves(pegs):
@@ -147,10 +201,9 @@ def moves(pegs):
 
 def is_solved ( pegs, table, stack):
     #print "Doing is_solved on: ", pegs 
-    # if (table.search(pegs)):
-    #     print "table look up says false for: ", pegs
-    #     return False 
-    
+    if (table.search(pegs)):
+        print "table look up says false for: ", pegs
+        return False, stack 
     for m in moves(pegs) :  #where moves p is an array that returns all possible moves
         board = ''.join(str(elem) for elem in m)
         #print m
@@ -160,14 +213,14 @@ def is_solved ( pegs, table, stack):
 
         result = is_solved(''.join(str(elem) for elem in m), table, stack)
         stack1 = result[1]
-        if ( result[0]):
+        if (result[0]):
             #print "true:::", m      #//prints in reverse so would use a stack to print in reverse order
             if (stack1[0] == ""):
                 stack1[0] = "11111"
             #print "stack1[0] ", stack1[0]
             stack1.append(m)
             return True, stack1
-    # table.insert(pegs)
+    table.insert(pegs)
     return False, stack
 
 
@@ -212,7 +265,7 @@ def main():
     else:
         print "Not Solvable"
     
-    #t.printHash()
+   # t.printHash()
     # t.insert(5,7)
     # t.printHash()
     # print "t.i:"
