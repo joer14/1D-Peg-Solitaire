@@ -56,7 +56,8 @@ class HashTable:
         print "Load Ratio: ", loadRatio, "hashTableSize: ", self.hashTableSize, " Load: ", self.load
 
         for nums in self.myList:
-            print self.myList[int(nums)] #prints in binary "{0:b}".format(
+            print nums
+            #print self.myList[int(nums)] #prints in binary "{0:b}".format(
 
     def checkLoad(self):
         loadRatio = float(self.load)/float(self.hashTableSize)
@@ -119,16 +120,26 @@ def moves(pegs):
                         cpPegsList[idx-2]= int(cpPegsList[idx-2])+1
                         moves.append(cpPegsList)
                         cpPegsList = list(pegsList)
-
+            #print len(pegsList)
             if (idx + 2 < len(pegsList)): ## not out of bounds to the right
                 if (int(pegsList[idx+2]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx+1]) == 1): # jumped over the a double peg to the direct right
                         print "jumped over double pegs to the right", idx
-                        del cpPegsList[idx]
+                        
                         cpPegsList[idx+2]= int(cpPegsList[idx+2])+1
+                        del cpPegsList[idx]
                         moves.append(cpPegsList)
                         cpPegsList = list(pegsList)
 
+            if (idx + 3 > 0): ## not out of bounds to the left
+                if (int(pegsList[idx+3]) == 0):  # needs to land on a single peg
+                    if (int(pegsList[idx+1]) + int(pegsList[idx+2]) == 0): # jumped over 2 single pegs peg to the direct left
+                        print "jumped over two single pegs to the left", idx
+                        
+                        cpPegsList[idx+3]= int(cpPegsList[idx+3])+1
+                        del cpPegsList[idx]
+                        moves.append(cpPegsList)
+                        cpPegsList = list(pegsList)
     
     print "Moves: " + str(moves)
     return moves
