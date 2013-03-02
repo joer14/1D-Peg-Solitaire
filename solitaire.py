@@ -101,12 +101,12 @@ def moves(pegs):
         # previousPeg = int(pegsList[idx-1])
         # previousPreviousPeg = int(pegsList[idx-1])
 
-        print idx, peg
+        #print idx, peg
         if (currentPeg == 0): #can't move a double peg
             if (idx - 3 >= 0): ## not out of bounds to the left
                 if (int(pegsList[idx-3]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx-1]) + int(pegsList[idx-2]) == 0): # jumped over 2 single pegs peg to the direct left
-                        print "jumped over two single pegs to the left", idx
+                        #print "jumped over two single pegs to the left", idx
                         del cpPegsList[idx]
                         cpPegsList[idx-3]= int(cpPegsList[idx-3])+1
                         moves.append(cpPegsList)
@@ -115,7 +115,7 @@ def moves(pegs):
             if (idx - 2 >= 0): ## not out of bounds to the left
                 if (int(pegsList[idx-2]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx-1]) == 1): # jumped over the a double peg to the direct left
-                        print "jumped over double pegs to the left", idx
+                        #print "jumped over double pegs to the left", idx
                         del cpPegsList[idx]
                         cpPegsList[idx-2]= int(cpPegsList[idx-2])+1
                         moves.append(cpPegsList)
@@ -124,37 +124,51 @@ def moves(pegs):
             if (idx + 2 < len(pegsList)): ## not out of bounds to the right
                 if (int(pegsList[idx+2]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx+1]) == 1): # jumped over the a double peg to the direct right
-                        print "jumped over double pegs to the right", idx
+                        #print "jumped over double pegs to the right", idx
                         
                         cpPegsList[idx+2]= int(cpPegsList[idx+2])+1
                         del cpPegsList[idx]
                         moves.append(cpPegsList)
                         cpPegsList = list(pegsList)
 
-            if (idx + 3 > 0): ## not out of bounds to the left
+            if (idx + 3 < len(pegsList)): ## not out of bounds to the right
                 if (int(pegsList[idx+3]) == 0):  # needs to land on a single peg
                     if (int(pegsList[idx+1]) + int(pegsList[idx+2]) == 0): # jumped over 2 single pegs peg to the direct left
-                        print "jumped over two single pegs to the left", idx
+                        #print "jumped over two single pegs to the right", idx
                         
                         cpPegsList[idx+3]= int(cpPegsList[idx+3])+1
                         del cpPegsList[idx]
                         moves.append(cpPegsList)
                         cpPegsList = list(pegsList)
     
-    print "Moves: " + str(moves)
+    #print "Moves: " + str(moves)
     return moves
 
 
-def is_solved ( pegs, table): 
-    if (table.search(pegs)):
-        return False 
+def is_solved ( pegs, table, stack):
+    #print "Doing is_solved on: ", pegs 
+    # if (table.search(pegs)):
+    #     print "table look up says false for: ", pegs
+    #     return False 
+    
     for m in moves(pegs) :  #where moves p is an array that returns all possible moves
-        print m
-        if (is_solved(''.join(str(elem) for elem in m), table)):
-            return True
-            print m      #//prints in reverse so would use a stack to print in reverse order
-    table.insert(pegs)
-    return False
+        board = ''.join(str(elem) for elem in m)
+        #print m
+        if (board == len(board)*'1'):
+            stack.append(m)
+            return True, stack
+
+        result = is_solved(''.join(str(elem) for elem in m), table, stack)
+        stack1 = result[1]
+        if ( result[0]):
+            #print "true:::", m      #//prints in reverse so would use a stack to print in reverse order
+            if (stack1[0] == ""):
+                stack1[0] = "11111"
+            #print "stack1[0] ", stack1[0]
+            stack1.append(m)
+            return True, stack1
+    # table.insert(pegs)
+    return False, stack
 
 
 def main():
@@ -176,16 +190,29 @@ def main():
     elif options.verbose: 
             print "reading %s..." % options.filename
             f = open(options.filename, 'r')
-            converted_board = f.read().strip().upper().replace('X', '1').replace('|', '0').replace(" ", "")
+            numberOfPegs = f.readline().rstrip()
+            print "number of Pegs: ", numberOfPegs
+            converted_board = f.readline().strip().upper().replace('X', '1').replace('|', '0').replace(" ", "")
 
-    print "board =", converted_board
-    print int(converted_board, 2)
-    print moves(converted_board)
+    print "Board =", converted_board
+    
+    #moves(converted_board)
 
     t = HashTable()
-    is_solved(converted_board, t)
+    stack = list()
+    results = is_solved(converted_board, t, stack)
+    if (results[0]):
+        print "Solvable"
+        print "Initial Board: "
+        print "        ", ' '.join(converted_board)
+        stack = results[1]
+        stack = reversed(stack)
+        for index, item in enumerate(stack):
+            print "Step", index + 1,":", ' '.join(str(elem) for elem in item)
+    else:
+        print "Not Solvable"
     
-    t.printHash()
+    #t.printHash()
     # t.insert(5,7)
     # t.printHash()
     # print "t.i:"
