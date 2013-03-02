@@ -17,7 +17,7 @@ class KeyValue:
     
 
 class HashTable:
-    myList = list([0]*10)
+    myList = list([0]*4097)
 
     def __init__(self):
         self.hashTableSize = 10
@@ -30,10 +30,7 @@ class HashTable:
         attempt = 0
         while (searching):
             thehash = self.hash(key, attempt)
-            # if (attempt > 0):
-            #     print "hash: ", thehash
-            #     print "attempt: ", attempt
-            #     print "self.myList[attempt] ", self.myList[attempt] 
+
             if (self.myList[attempt] == key ):
                 #print "found in table"
                 return True 
@@ -41,23 +38,6 @@ class HashTable:
                 return False
             attempt = attempt+1
 
-        # h1 = self.hash1(key)
-        # h2 = self.hash1(key)
-        # m = float(self.hashTableSize) 
-        # searching = True
-        # ivalue = 0
-        # while (searching):
-        #     index = int((h1 + ivalue*h2) % m)
-        #     ivalue = ivalue + 1
-        #     print "self.myList[index]: ", index, self.myList[index]
-        #     if (self.myList[index] == key ):
-        #         print "found in table"
-        #         return True
-        #     else:
-        #         index =int((h1 + ivalue*h2) % m)
-
-        # return False
-        #probe until find blank spot or value. if blank return false
         
     def insert(self, value):
         self.checkLoad()
@@ -77,12 +57,6 @@ class HashTable:
         
         return int((h1 + ivalue*h2) % m)
   
-
-        #  def hash(self,key):
-        # # loop through the characters of the key
-        # #     convert the character to a number  (use ord(c))
-        # #     add this number to running total
-        # # return (total modulo sizeOfHashTable)   modulo is '%' in Python.
     def hash1(self,value):
         A = (math.sqrt(5)-1)/2
         key = float(value)  
@@ -98,11 +72,6 @@ class HashTable:
         m = float(self.hashTableSize) 
         return math.floor(m*((m*frac) % 1))
 
-        #  def hash(self,key):
-        # # loop through the characters of the key
-        # #     convert the character to a number  (use ord(c))
-        # #     add this number to running total
-        # # return (total modulo sizeOfHashTable)   modulo is '%' in Python.
 
     def printHash(self):
         print "Printing HashTable:"
@@ -112,17 +81,15 @@ class HashTable:
         for nums in self.myList:
             if (nums != 0):
                 print nums
-            #print self.myList[int(nums)] #prints in binary "{0:b}".format(
 
     def checkLoad(self):
         loadRatio = float(self.load)/float(self.hashTableSize)
         if (loadRatio > .2):
-            print "ratio >.2 so quading"
-            print "Load Ratio: ", loadRatio, "hashTableSize: ", self.hashTableSize, " Load: ", self.load
+            #print "ratio >.2 so quading"
+            #print "Load Ratio: ", loadRatio, "hashTableSize: ", self.hashTableSize, " Load: ", self.load
             self.quadHashTable()
         return loadRatio
 
-        #return self.load
 
     def quadHashTable(self):
         oldLength = int(self.hashTableSize)
@@ -145,17 +112,7 @@ def moves(pegs):
     for idx, peg in enumerate(pegsList):
         cpPegsList = list(pegsList)
         currentPeg = int(pegsList[idx])
-        # print idx, peg
-        # nextPeg = int(pegsList[idx+1])
-        # if (idx+2 < len(pegsList)):
-        #     nextnextPeg = int(pegsList[idx+2])
-        # if (idx-2 >= 0):
-        #     previousPreviousPeg = int(pegsList[idx+2])    
 
-        # previousPeg = int(pegsList[idx-1])
-        # previousPreviousPeg = int(pegsList[idx-1])
-
-        #print idx, peg
         if (currentPeg == 0): #can't move a double peg
             if (idx - 3 >= 0): ## not out of bounds to the left
                 if (int(pegsList[idx-3]) == 0):  # needs to land on a single peg
@@ -199,11 +156,12 @@ def moves(pegs):
     return moves
 
 
-def is_solved ( pegs, table, stack):
+def is_solved ( pegs, table, stack, hashOn):
     #print "Doing is_solved on: ", pegs 
-    if (table.search(pegs)):
-        print "table look up says false for: ", pegs
-        return False, stack 
+    if (hashOn):
+        if (table.search(pegs)):
+            #print "table look up says false for: ", pegs
+            return False, stack 
     for m in moves(pegs) :  #where moves p is an array that returns all possible moves
         board = ''.join(str(elem) for elem in m)
         #print m
@@ -211,7 +169,7 @@ def is_solved ( pegs, table, stack):
             stack.append(m)
             return True, stack
 
-        result = is_solved(''.join(str(elem) for elem in m), table, stack)
+        result = is_solved(''.join(str(elem) for elem in m), table, stack, hashOn)
         stack1 = result[1]
         if (result[0]):
             #print "true:::", m      #//prints in reverse so would use a stack to print in reverse order
@@ -220,7 +178,8 @@ def is_solved ( pegs, table, stack):
             #print "stack1[0] ", stack1[0]
             stack1.append(m)
             return True, stack1
-    table.insert(pegs)
+    if (hashOn):
+        table.insert(pegs)
     return False, stack
 
 
@@ -235,9 +194,16 @@ def main():
                       action="store_true", dest="verbose")
     parser.add_option("-q", "--quiet",
                       action="store_false", dest="verbose")
+    parser.add_option("-o", "--hashoff",
+                      action="store_true", dest="hashOff", default="False")
     
     (options, args) = parser.parse_args()
-    
+    hashOff = True
+    if (options.hashOff == True):
+        hashOff = True
+    else:
+        hashOff = False
+    hashOn = not hashOff
     if (options.filename == "True"):
         converted_board = getInput()
     elif options.verbose: 
@@ -250,10 +216,14 @@ def main():
     print "Board =", converted_board
     
     #moves(converted_board)
+    if (hashOn):
+        print "Hashing On"
+    else: 
+        print "Hashing Off"
 
     t = HashTable()
     stack = list()
-    results = is_solved(converted_board, t, stack)
+    results = is_solved(converted_board, t, stack, hashOn)
     if (results[0]):
         print "Solvable"
         print "Initial Board: "
@@ -265,18 +235,7 @@ def main():
     else:
         print "Not Solvable"
     
-   # t.printHash()
-    # t.insert(5,7)
-    # t.printHash()
-    # print "t.i:"
-    # print t.myList
-    # print "t.set_instance:"
-    # print t.set_instance(5,"yo")
-    # print t.get_instance_i()
-    # print t.myList
-    # t.insert(6,"yo")
-    # print t.myList
-    # print t.get(5)
+ 
 
 
 if __name__ == "__main__":
