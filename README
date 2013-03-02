@@ -4,3 +4,29 @@ jrowley@ucsc.edu
 For CS101
 Winter Quarter 2013
 Manfred Warmuth
+
+
+
+Usage: solitaire.py [options] arg
+
+Options:
+  -h, --help            show this help message and exit
+  -f FILENAME, --file=FILENAME
+                        use FILENAME as a board
+  -o, --hashoff		turn off hashing 
+
+
+
+Input in form of number of pegs followed by a line break, then 0 1 1 1 0, etc. 0 represents a single peg while 1 represents a double peg. It strips whitespace automatically.
+
+The hashtable is advantagous for inputs greater than 8 or so, although isn't needed in some cases such as input6.txt which has 14 pegs. This is due to the inital pattern 0110 which is unsolvable. One parameter I changed was the initial has table size. Before it was a power of 2, however, ideally it should a power of two offset by 1, as this improves performance. 
+
+
+Add a short (half page) description of what you observed:
+- For what type/size of inputs did the hash table give an advantage?
+- If you tuned any parameters, what was your rationale?
+- Anything else insightful
+
+
+
+

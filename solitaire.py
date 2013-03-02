@@ -1,8 +1,9 @@
-# import sys, getopt
-# from optparse import OptionParser
-
-# #input_board = raw_input("Enter board:")
-# #print "raw_input =", str1
+#1D Peg Solitaire
+#Joe Rowley
+#jrowley@ucsc.edu
+#For CS101
+#Winter Quarter 2013
+#Manfred Warmuth
 
 from optparse import OptionParser
 import math
