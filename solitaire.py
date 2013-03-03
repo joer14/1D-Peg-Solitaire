@@ -93,6 +93,7 @@ class HashTable:
 
 
     def quadHashTable(self):
+        print "quading"
         oldLength = int(self.hashTableSize)
         self.load = int(0)
         self.hashTableSize = (oldLength*4) + 1      #set new hash table size 
@@ -207,12 +208,14 @@ def main():
     hashOn = not hashOff
     if (options.filename == "True"):
         converted_board = getInput()
-    elif options.verbose: 
+    else:
+        f = open(options.filename, 'r')
+        numberOfPegs = f.readline().rstrip()
+        converted_board = f.readline().strip().upper().replace('X', '1').replace('|', '0').replace(" ", "")
+        if options.verbose: 
             print "reading %s..." % options.filename
-            f = open(options.filename, 'r')
-            numberOfPegs = f.readline().rstrip()
             print "number of Pegs: ", numberOfPegs
-            converted_board = f.readline().strip().upper().replace('X', '1').replace('|', '0').replace(" ", "")
+            
 
     print "Board =", converted_board
     
